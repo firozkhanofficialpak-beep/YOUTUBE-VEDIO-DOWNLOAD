@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, request, redirect, send_from_directory
 import yt_dlp
 import os
 
@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return send_from_directory('.', 'index.html')
 
 @app.route('/download')
 def download():
@@ -23,13 +23,11 @@ def download():
         
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(video_url, download=False)
-            # YouTube ka direct playable stream URL nikalna
             direct_url = info.get('url')
             
             if not direct_url:
                 return "Video link extract nahi ho paya.", 500
                 
-            # User ko direct video stream par redirect karna
             return redirect(direct_url)
 
     except Exception as e:
@@ -39,4 +37,4 @@ def download():
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
-      
+    
